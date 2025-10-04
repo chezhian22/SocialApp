@@ -18,6 +18,7 @@ import {
 } from "@chakra-ui/react";
 import UserNavbar from "./UserNav";
 import { jwtDecode } from "jwt-decode";
+import { API_BASE_URL } from '../../config/api';
 
 const PostDetail = () => {
   const { id } = useParams();
@@ -37,7 +38,7 @@ const PostDetail = () => {
   useEffect(() => {
     // Fetch post details
     axios
-      .get(`http://localhost:5000/api/feed/${id}`, {
+      .get(`${API_BASE_URL}/api/feed/${id}`, {
         headers: { Authorization: localStorage.getItem("token") },
       })
       .then((res) => {
@@ -49,7 +50,7 @@ const PostDetail = () => {
         setIsLoading(false);
       });
     axios
-      .get(`http://localhost:5000/api/comments/${id}`, {
+      .get(`${API_BASE_URL}/api/comments/${id}`, {
         headers: { Authorization: localStorage.getItem("token") },
       })
       .then((res) => setComments(res.data))
@@ -62,7 +63,7 @@ const PostDetail = () => {
   }
 
   const submitComment =async(id)=>{
-      await axios.post(`http://localhost:5000/api/post-comment/${id}`,newComment,{
+      await axios.post(`${API_BASE_URL}/api/post-comment/${id}`,newComment,{
         headers:{Authorization:localStorage.getItem('token')}
       }).then(res=>{
         console.log(res.data.msg)
@@ -89,7 +90,7 @@ const PostDetail = () => {
   }
   const handleConnection =async()=>{
     const receiver_id = post.user_id;
-     await axios.post(`http://localhost:5000/api/initiate-connection/${receiver_id}/${user_id}`,{},{
+     await axios.post(`${API_BASE_URL}/api/initiate-connection/${receiver_id}/${user_id}`,{},{
       headers:{Authorization:localStorage.getItem('token')}
      }).then(res=>console.log(res)).catch(err=>console.log("errrrrrrrrrrrrr"+err));
   }
@@ -131,7 +132,7 @@ const PostDetail = () => {
               </Box>
               <Image
               objectFit="cover"
-              src={`http://localhost:5000/Post_images/${post.image_url}`} alt="post image"
+              src={`${API_BASE_URL}/Post_images/${post.image_url}`} alt="post image"
               maxH="300px"
               maxW="300px"
               borderRadius="lg"

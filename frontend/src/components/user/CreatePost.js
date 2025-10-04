@@ -3,6 +3,7 @@ import UserNav from './UserNav';
 import axios from 'axios';
 import { Form, useNavigate } from 'react-router-dom';
 import { Box, Button, FormControl, FormLabel, Heading, Input, Textarea, VStack ,useToast} from '@chakra-ui/react';
+import { API_BASE_URL } from '../../config/api';
 
 const CreatePost = () => {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ const CreatePost = () => {
         formData.append("title",createPost.title);
         formData.append("content",createPost.content);
         formData.append("image",createPost.image)
-        await axios.post('http://localhost:5000/api/create-post',formData,
+        await axios.post(`${API_BASE_URL}/api/create-post`,formData,
           {headers:{Authorization:localStorage.getItem('token')}});
          
           toast({

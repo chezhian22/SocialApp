@@ -8,6 +8,7 @@ const multer = require("multer");
 const path = require("path");
 const http = require("http");
 const { Server } = require("socket.io");
+const initDatabase = require("./init-db");
 
 const app = express();
 const server = http.createServer(app);
@@ -17,17 +18,18 @@ const io = new Server(server, {
     methods: ["GET", "POST"],
   },
 });
-const PORT = 5000;
+const PORT = 5001;
 const SECRET_Key = "i_am_hero";
 
 app.use(cors());
 app.use(bodyParser.json());
 
 const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "semmozhi9944191756",
-  database: "socialapp",
+  host: process.env.DB_HOST || "localhost",
+  port: process.env.DB_PORT || 3306,
+  user: process.env.DB_USER || "root",
+  password: process.env.DB_PASSWORD || "semma@2004",
+  database: process.env.DB_NAME || "socialapp",
 });
 
 const storage = multer.diskStorage({
@@ -44,17 +46,31 @@ const upload = multer({ storage: storage });
 
 app.use("/Post_images", express.static(path.join(__dirname, "Post_images")));
 
+// Initialize database and tables on startup
+(async () => {
+  try {
+    await initDatabase();
+    console.log("Database initialization complete");
+  } catch (err) {
+    console.error("Database initialization failed:", err);
+  }
+})();
+
 db.connect((err) => {
   if (err) throw err;
   console.log("MySQL Connected...");
 });
 
 app.post("/messages", (req, res) => {
+  console.log(req.body);
   const { sender_id, receiver_id, message } = req.body;
   const sql =
     "INSERT INTO messages (sender_id, receiver_id, message) VALUES (?, ?, ?)";
   db.query(sql, [sender_id, receiver_id, message], (err) => {
-    if (err) return res.status(500).send(err);
+    if (err) {
+      console.error("Error saving message:", err);
+      return res.status(500).json({ error: err.message });
+    }
     res.send({ status: "Message saved" });
   });
 });
@@ -62,12 +78,15 @@ app.post("/messages", (req, res) => {
 app.get("/messages/:user1/:user2", (req, res) => {
   const { user1, user2 } = req.params;
   const sql = `
-      SELECT * FROM messages 
-      WHERE (sender_id = ? AND receiver_id = ?) 
+      SELECT * FROM messages
+      WHERE (sender_id = ? AND receiver_id = ?)
          OR (sender_id = ? AND receiver_id = ?)
       ORDER BY timestamp ASC`;
   db.query(sql, [user1, user2, user2, user1], (err, results) => {
-    if (err) return res.status(500).send(err);
+    if (err) {
+      console.error("Error fetching messages:", err);
+      return res.status(500).json({ error: err.message });
+    }
     res.send(results);
   });
 });
@@ -77,11 +96,14 @@ io.on("connection", (socket) => {
   console.log("New user connected:", socket.id);
 
   socket.on("join", (userId) => {
+    console.log(`User ${userId} joined their room`);
     socket.join(userId.toString()); // join user to their room
   });
 
   socket.on("sendMessage", (data) => {
     const { sender_id, receiver_id, message } = data;
+    console.log(`Message from ${sender_id} to ${receiver_id}: ${message}`);
+    console.log(`Emitting to room: ${receiver_id.toString()}`);
     io.to(receiver_id.toString()).emit("receiveMessage", data);
   });
 
@@ -371,45 +393,53 @@ app.post(
 
 app.get("/api/connections/:user_id", verifyToken, async (req, res) => {
   const user_id = req.params.user_id;
-  try{
-  const [friends] = await db.promise().query("select u.id as friend_id,u.username from connections c join users u on u.id = case when requester_id=? then receiver_id else requester_id end where c.status='Accepted' and (? in (requester_id,receiver_id))",[user_id,user_id]);
-  res.json(friends)
-//   console.log(friends)
-  }catch(err){
-    res.json("retrival error")
-    console.log(err)
+  try {
+    const [friends] = await db
+      .promise()
+      .query(
+        "select u.id as friend_id,u.username from connections c join users u on u.id = case when requester_id=? then receiver_id else requester_id end where c.status='accepted' and (? in (requester_id,receiver_id))",
+        [user_id, user_id]
+      );
+    res.json(friends);
+    //   console.log(friends)
+  } catch (err) {
+    res.json("retrival error");
+    console.log(err);
   }
 });
 
-app.get("/api/friend-requests/:user_id", verifyToken,async (req,res)=>{
-    const user_id = req.params.user_id;
-    try{
-        const [requests] = await db.promise().query("select c.id as connection_id,u.id,u.username from connections c join users u on c.requester_id = u.id where c.receiver_id =? and c.status='Pending'",[user_id]);
-        res.json(requests)
-    }catch(err){
-        console.log(err)
-    }
-})
+app.get("/api/friend-requests/:user_id", verifyToken, async (req, res) => {
+  const user_id = req.params.user_id;
+  try {
+    const [requests] = await db
+      .promise()
+      .query(
+        "select c.id as connection_id,u.id,u.username from connections c join users u on c.requester_id = u.id where c.receiver_id =? and c.status='Pending'",
+        [user_id]
+      );
+    res.json(requests);
+  } catch (err) {
+    console.log(err);
+  }
+});
 
 app.put("/api/handle-request/:id", async (req, res) => {
-  const { id } = req.params; 
-  const {status} = req.body;
-  if(!["accepted","rejected"].includes(status)){
-    return res.status(400).json({error:"Invalid staus"});
+  const { id } = req.params;
+  const { status } = req.body;
+  if (!["accepted", "rejected"].includes(status)) {
+    return res.status(400).json({ error: "Invalid staus" });
   }
-  console.log(id+" "+status)
+  console.log(id + " " + status);
   try {
-    await db.promise().query(
-      "UPDATE connections SET status = ? WHERE id = ?",
-      [status,id]
-    );
+    await db
+      .promise()
+      .query("UPDATE connections SET status = ? WHERE id = ?", [status, id]);
     res.json({ success: true, message: `Friend request ${status}` });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "Failed to request" });
   }
 });
-
 
 server.listen(PORT, () =>
   console.log(`Backend running with Socket.IO on http://localhost:${PORT}`)

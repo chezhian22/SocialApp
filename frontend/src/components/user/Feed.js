@@ -23,6 +23,7 @@ import { hover } from "framer-motion";
 import { SearchIcon } from "@chakra-ui/icons";
 import NotificationBox from "../FriendRequests";
 import FriendRequests from "../FriendRequests";
+import { API_BASE_URL } from '../../config/api';
 
 const Feed = () => {
   const [feeds, setFeeds] = useState([]);
@@ -38,8 +39,8 @@ const Feed = () => {
       try {
         const res = await axios.get(
           searchTerm
-            ? `http://localhost:5000/api/search-posts?q=${searchTerm}`
-            : "http://localhost:5000/api/feeds",
+            ? `${API_BASE_URL}/api/search-posts?q=${searchTerm}`
+            : `${API_BASE_URL}/api/feeds`,
           {
             headers: { Authorization: localStorage.getItem("token") },
           }
@@ -58,7 +59,7 @@ const Feed = () => {
   const handleLike = async (id) => {
     try {
       await axios.post(
-        `http://localhost:5000/api/like/${id}`,
+        `${API_BASE_URL}/api/like/${id}`,
         {},
         {
           headers: { Authorization: localStorage.getItem("token") },
@@ -115,7 +116,7 @@ const Feed = () => {
                 >
                   {feed.image_url && (
                     <Image
-                      src={`http://localhost:5000/Post_images/${feed.image_url}`}
+                      src={`${API_BASE_URL}/Post_images/${feed.image_url}`}
                       alt="Post image"
                       maxH="300px"
                       w="100%"

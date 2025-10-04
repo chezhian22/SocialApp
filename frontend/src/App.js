@@ -38,8 +38,8 @@ function App() {
               <Route path="/admin" element={<Admin />} />
               <Route path="/admin/all-users" element={<AllUsers />} />
               <Route path="/admin/manage-posts" element={<ManagePost />} />
-              <Route path="/admin/profile/:id" element={<Profile/>}/>
-              <Route path="/post/:id" element={<PostDetail/>}/>
+              <Route path="/admin/profile/:id" element={<Profile />} />
+              <Route path="/post/:id" element={<PostDetail />} />
               <Route path="*" element={<Navigate to="/admin" />} />
             </>
           ) : (
@@ -48,8 +48,11 @@ function App() {
               <Route path="/post/:id" element={<PostDetail />} />
               <Route path="/create-post" element={<CreatePost />} />
               <Route path="/profile/:id" element={<Profile />} />
-              <Route path="/chatbox/chat/:sender_id/:receiver_id" element={<Chat/>}/>
-              <Route path="/chatbox" element={<ChatBox/>}/>
+              <Route
+                path="/chatbox/chat/:sender_id/:receiver_id"
+                element={<Chat />}
+              />
+              <Route path="/chatbox" element={<ChatBox />} />
               <Route path="*" element={<Navigate to="/feed" />} />
             </>
           )}

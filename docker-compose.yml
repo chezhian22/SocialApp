@@ -1,0 +1,68 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: socialapp-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: semma@2004
+      MYSQL_DATABASE: socialapp
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - socialapp-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # Backend Service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: socialapp-backend
+    restart: always
+    ports:
+      - "5001:5001"
+    environment:
+      - DB_HOST=mysql
+      - DB_USER=root
+      - DB_PASSWORD=semma@2004
+      - DB_NAME=socialapp
+      - DB_PORT=3306
+      - PORT=5001
+    volumes:
+      - ./backend/Post_images:/app/Post_images
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - socialapp-network
+
+  # Frontend Service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: socialapp-frontend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:5001
+    depends_on:
+      - backend
+    networks:
+      - socialapp-network
+
+networks:
+  socialapp-network:
+    driver: bridge
+
+volumes:
+  mysql_data:

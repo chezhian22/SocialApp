@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import AdminNavbar from "./AdminNavbar";
+import { API_BASE_URL } from '../../config/api';
 import {
   Box,
   Divider,
@@ -32,8 +33,8 @@ const AllUsers = () => {
       await axios
         .get(
           searchTerm
-            ? `http://localhost:5000/api/search-users/${searchTerm}`
-            : "http://localhost:5000/api/users",
+            ? `${API_BASE_URL}/api/search-users/${searchTerm}`
+            : `${API_BASE_URL}/api/users`,
           {
             headers: { Authorization: localStorage.getItem("token") },
           }
@@ -49,7 +50,7 @@ const AllUsers = () => {
 
   const deleteUser = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/delete-user/${id}`);
+      await axios.delete(`${API_BASE_URL}/api/delete-user/${id}`);
       toast({
         title: "User deleted",
         description: "user has been deleted successfulyy",

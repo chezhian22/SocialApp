@@ -14,6 +14,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { Form } from "react-router-dom";
 import { getUserRole } from "../../utils/auth";
+import { API_BASE_URL } from "../../config/api";
 
 const LoginRegister = ({ onAuthSuccess }) => {
   const [formData, setFormData] = useState({
@@ -37,7 +38,7 @@ const LoginRegister = ({ onAuthSuccess }) => {
 
     try {
       const res = await axios.post(
-        `http://localhost:5000/api/${endpoint}`,
+        `${API_BASE_URL}/api/${endpoint}`,
         formData
       );
       if (isLogin) {

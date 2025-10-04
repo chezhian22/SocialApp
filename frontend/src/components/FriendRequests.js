@@ -16,7 +16,8 @@ import {
 } from "@chakra-ui/react";
 import { jwtDecode } from "jwt-decode";
 import { BellIcon } from "@chakra-ui/icons";
-import axios from 'axios'
+import axios from 'axios';
+import { API_BASE_URL } from '../config/api';
 
 export default function FriendRequests() {
   const [friendRequests, setFriendRequests] = useState([]);
@@ -27,7 +28,7 @@ export default function FriendRequests() {
   useEffect(()=>{
     const fetchRequests = async () =>{
       try{
-        const res = await axios.get(`http://localhost:5000/api/friend-requests/${user_id}`,{
+        const res = await axios.get(`${API_BASE_URL}/api/friend-requests/${user_id}`,{
           headers: {Authorization: token },
         });
         setFriendRequests(res.data);
@@ -41,7 +42,7 @@ export default function FriendRequests() {
  const handleRequest = async (requestId, action) => {
   try {
     await axios.put(
-      `http://localhost:5000/api/handle-request/${requestId}`,
+      `${API_BASE_URL}/api/handle-request/${requestId}`,
       { status: action },
       { headers: { Authorization: token } }
     );

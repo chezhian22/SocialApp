@@ -2,6 +2,7 @@ import React from "react";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import AdminNavbar from "./AdminNavbar";
+import { API_BASE_URL } from '../../config/api';
 import {
   Heading,
   Box,
@@ -34,8 +35,8 @@ const ManagePost = () => {
       try {
         const res = await axios.get(
           searchTerm
-            ? `http://localhost:5000/api/search-posts?q=${searchTerm}`
-            : "http://localhost:5000/api/feeds",
+            ? `${API_BASE_URL}/api/search-posts?q=${searchTerm}`
+            : `${API_BASE_URL}/api/feeds`,
           {
             headers: { Authorization: localStorage.getItem("token") },
           }
@@ -51,7 +52,7 @@ const ManagePost = () => {
   console.log(searchTerm);
   const deletePost = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/delete-post/${id}`);
+      await axios.delete(`${API_BASE_URL}/api/delete-post/${id}`);
       toast({
         title: "Post deleted",
         description: "your post has been deleted successfully",
@@ -119,7 +120,7 @@ const ManagePost = () => {
                     onClick={() => navigate(`/post/${feed.id}`)}
                   >
                     <Image
-                      src={`http://localhost:5000/Post_images/${feed.image_url}`}
+                      src={`${API_BASE_URL}/Post_images/${feed.image_url}`}
                       alt="post-image"
                       objectFit="cover"
                       maxH="300px"

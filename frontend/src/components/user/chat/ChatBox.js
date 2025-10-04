@@ -5,6 +5,7 @@ import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Button } from "@chakra-ui/react";
+import { API_BASE_URL } from '../../../config/api';
 
 const ChatBox = () => {
   const [users, setUsers] = useState([]);
@@ -19,7 +20,7 @@ const ChatBox = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/connections/${user_id}`, {
+        const res = await axios.get(`${API_BASE_URL}/api/connections/${user_id}`, {
           headers: { Authorization: token },
         });
         setUsers(res.data);
@@ -72,14 +73,14 @@ const ChatBox = () => {
             {users.length > 0 ? (
               users.map((user) => (
                 <Box
-                  key={user.id}
+                  key={user.friend_id}
                   p={3}
                   borderWidth="1px"
                   borderRadius="lg"
                   shadow="sm"
                   cursor="pointer"
                   _hover={{ bg: "gray.100" }}
-                  onClick={() => handleClick(user.id)}
+                  onClick={() => handleClick(user.friend_id)}
                 >
                   <Text fontWeight="bold" fontSize="xl">{user.username}</Text>
                   <Text fontSize="sm" color="gray.600">

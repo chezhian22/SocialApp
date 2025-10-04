@@ -1,5 +1,6 @@
 import React, { useState,useEffect } from 'react';
 import axios from 'axios';
+import { API_BASE_URL } from './config/api';
 
 const Dashboard =()=>{
     const [data,setData] = useState('');
@@ -7,7 +8,7 @@ const Dashboard =()=>{
         localStorage.clear();
     }
     useEffect(()=>{
-        axios.get("http://localhost:5000/api/dashboard",{
+        axios.get(`${API_BASE_URL}/api/dashboard`,{
             headers:{Authorization: localStorage.getItem('token')}
         }).then(res=> setData(res.data.msg)).catch(err => setData('Access Denied. Please login.'));
     },[])

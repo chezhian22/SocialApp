@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import UserNavbar from "./UserNav";
+import { API_BASE_URL } from '../../config/api';
 import {
   Box,
   Heading,
@@ -27,7 +28,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchData = async () => {
       await axios
-        .get(`http://localhost:5000/api/user-profile/${id}`, {
+        .get(`${API_BASE_URL}/api/user-profile/${id}`, {
           headers: { Authorization: localStorage.getItem("token") },
         })
         .then((res) => {
@@ -41,7 +42,7 @@ const Profile = () => {
 
   const deletePost = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/delete-post/${id}`);
+      await axios.delete(`${API_BASE_URL}/api/delete-post/${id}`);
       toast({
         title: "Post deleted",
         description: "your post has been successfully deleted",
@@ -123,7 +124,7 @@ const Profile = () => {
                 flexDirection="column"
               >
                 <Image
-                src={`http://localhost:5000/Post_images/${post.image_url}`}
+                src={`${API_BASE_URL}/Post_images/${post.image_url}`}
                 alt="post image"
                 maxH="300px"
                 w="100%"/>
