@@ -45,24 +45,18 @@ services:
       - socialapp-network
 
   # Frontend Service
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: socialapp-frontend
-    restart: always
-    ports:
-      - "3000:3000"
-    environment:
-      - REACT_APP_API_URL=http://localhost:5001
-    depends_on:
-      - backend
-    networks:
-      - socialapp-network
+frontend:
+  build:
+    context: ./frontend
+    dockerfile: Dockerfile
+  container_name: socialapp-frontend
+  restart: always
+  ports:
+    - "3000:3000"
+  environment:
+    - REACT_APP_API_URL=http://52.90.158.202:5001  # <-- use EC2 public IP
+  depends_on:
+    - backend
+  networks:
+    - socialapp-network
 
-networks:
-  socialapp-network:
-    driver: bridge
-
-volumes:
-  mysql_data:
