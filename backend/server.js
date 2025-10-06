@@ -14,7 +14,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://52.90.158.202:3000", // your React frontend
+    origin: "*", // allow all origins for simplicity inside Docker network
     methods: ["GET", "POST"],
   },
 });
