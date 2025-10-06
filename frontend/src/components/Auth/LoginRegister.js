@@ -12,7 +12,6 @@ import {
   Heading,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-import { Form } from "react-router-dom";
 import { getUserRole } from "../../utils/auth";
 import { API_BASE_URL } from "../../config/api";
 
@@ -39,21 +38,25 @@ const LoginRegister = ({ onAuthSuccess }) => {
     try {
       const res = await axios.post(
         `${API_BASE_URL}/api/${endpoint}`,
-        formData
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
+
       if (isLogin) {
         localStorage.setItem("token", res.data.token);
         onAuthSuccess();
         const role = getUserRole();
-        if(role=="admin"){
-          navigate("/admin")
-        }else if(role=="user"){
-          navigate("/feed")
-        }
-        
+        if (role === "admin") navigate("/admin");
+        else if (role === "user") navigate("/feed");
       }
+
       setMessage(res.data.msg || "Success!");
     } catch (err) {
+      console.error(err.response);
       setMessage(err.response?.data?.msg || "Something went wrong");
     }
   };
@@ -65,10 +68,12 @@ const LoginRegister = ({ onAuthSuccess }) => {
       mt={10}
       p={6}
       borderWidth={1}
-      borderRadius="1g"
+      borderRadius="lg"
       boxShadow="lg"
     >
-      <Heading align="center" afontSize="2xl" mb={4}>{isLogin ? "Login" : "Register"}</Heading>
+      <Heading align="center" fontSize="2xl" mb={4}>
+        {isLogin ? "Login" : "Register"}
+      </Heading>
       <form onSubmit={handleSubmit}>
         <VStack spacing={4}>
           {!isLogin && (
@@ -86,7 +91,7 @@ const LoginRegister = ({ onAuthSuccess }) => {
             <Input
               name="email"
               type="email"
-              placeholder="email"
+              placeholder="Email"
               onChange={handleChange}
             />
           </FormControl>
@@ -95,23 +100,34 @@ const LoginRegister = ({ onAuthSuccess }) => {
             <Input
               name="password"
               type="password"
-              placeholder="password"
+              placeholder="Password"
               onChange={handleChange}
             />
           </FormControl>
           {!isLogin && (
             <FormControl isRequired>
-              <Select name="role" defaultValue="user" onChange={handleChange}>
+              <Select
+                name="role"
+                defaultValue="user"
+                onChange={handleChange}
+              >
                 <option value="user">User</option>
                 <option value="admin">Admin</option>
               </Select>
             </FormControl>
           )}
-          <Button colorScheme="blue" type="submit" width='full'>{isLogin?'Login':'Regster'}
+          <Button colorScheme="blue" type="submit" width="full">
+            {isLogin ? "Login" : "Register"}
           </Button>
         </VStack>
-        <Button mt={4} variant='link' onClick={()=> setIsLogin(!isLogin)}>{isLogin?'Switch to Register':'Switch to Login'}</Button>
-        {message&&<Text mt={4} color="red.500">{message}</Text>}
+        <Button
+          mt={4}
+          variant="link"
+          onClick={() => setIsLogin(!isLogin)}
+        >
+          {isLogin ? "Switch to Register" : "Switch to Login"}
+        </Button>
+        {message && <Text mt={4} color="red.500">{message}</Text>}
       </form>
     </Box>
   );
