@@ -59,3 +59,12 @@ services:
       - backend
     networks:
       - socialapp-network
+
+# Define networks
+networks:
+  socialapp-network:
+    driver: bridge
+
+# Define volumes
+volumes:
+  mysql_data:
