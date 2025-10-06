@@ -441,6 +441,7 @@ app.put("/api/handle-request/:id", async (req, res) => {
   }
 });
 
-server.listen(PORT, () =>
-  console.log(`Backend running with Socket.IO on http://localhost:${PORT}`)
+server.listen(PORT, '0.0.0.0', () =>
+  console.log(`Backend running with Socket.IO on http://0.0.0.0:${PORT}`)
 );
+
