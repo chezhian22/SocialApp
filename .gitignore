@@ -103,3 +103,14 @@ temp/
 
 # Claude Code directory
 .claude/
+
+# Deployment and documentation files
+DEPLOYMENT_GUIDE.md
+ELASTIC_IP_SETUP.md
+DOMAIN_SETUP.md
+
+# AWS and deployment related
+*.pem
+*.key
+secure.pem
+chmod
