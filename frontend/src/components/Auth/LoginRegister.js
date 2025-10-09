@@ -56,7 +56,7 @@ const LoginRegister = ({ onAuthSuccess }) => {
 
       setMessage(res.data.msg || "Success!");
     } catch (err) {
-      console.error(err.response);
+      console.error(err);
       setMessage(err.response?.data?.msg || "Something went wrong");
     }
   };
