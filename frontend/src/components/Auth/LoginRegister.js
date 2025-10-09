@@ -47,7 +47,18 @@ const LoginRegister = ({ onAuthSuccess }) => {
       );
 
       if (isLogin) {
-        localStorage.setItem("token", res.data.token);
+        console.log("Login response:", res.data);
+        const token = res.data.token;
+
+        // Validate token exists and has correct format
+        if (!token || typeof token !== 'string' || token.split('.').length !== 3) {
+          console.error("Invalid token received:", token);
+          console.error("Full response:", res.data);
+          setMessage("Invalid token received from server");
+          return;
+        }
+
+        localStorage.setItem("token", token);
         onAuthSuccess();
         const role = getUserRole();
         if (role === "admin") navigate("/admin");

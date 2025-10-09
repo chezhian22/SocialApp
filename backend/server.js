@@ -145,19 +145,20 @@ app.post("/api/login", async (req, res) => {
     .query("select * from users where email=?", [email]);
   if (rows.length <= 0) return res.status(400).json({ msg: "user not exist" });
   const user = rows[0];
+  console.log("User data from DB:", user);
   const match = await bcrypt.compare(password, user.password);
   if (!match) return res.status(400).json({ msg: "Invalid credentials" });
   const token = jwt.sign(
     {
       user_id: user.id,
       username: user.email,
-      // password: user.password,
       role: user.role,
     },
     SECRET_Key,
     { expiresIn: "1h" }
   );
-  res.json({ token });
+  console.log("Generated token:", token);
+  res.json({ token, msg: "Login successful" });
 });
 
 const verifyToken = (req, res, next) => {
