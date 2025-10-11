@@ -379,16 +379,28 @@ app.post(
     console.log(receiver_id);
     console.log(requester_id);
     try {
+      // Check if connection already exists
+      const [existing] = await db
+        .promise()
+        .query(
+          "SELECT * FROM connections WHERE (requester_id=? AND receiver_id=?) OR (requester_id=? AND receiver_id=?)",
+          [requester_id, receiver_id, receiver_id, requester_id]
+        );
+
+      if (existing.length > 0) {
+        return res.status(400).json({ msg: "Connection already exists" });
+      }
+
       await db
         .promise()
         .query(
           "insert into connections(requester_id,receiver_id,status) values(?,?,?)",
-          [requester_id, receiver_id, "Pending"]
+          [requester_id, receiver_id, "pending"]
         );
-      res.json("Connection initiated");
+      res.json({ msg: "Connection initiated" });
     } catch (err) {
       console.log(err);
-      res.json("server error");
+      res.status(500).json({ msg: "server error" });
     }
   }
 );
@@ -416,12 +428,13 @@ app.get("/api/friend-requests/:user_id", verifyToken, async (req, res) => {
     const [requests] = await db
       .promise()
       .query(
-        "select c.id as connection_id,u.id,u.username from connections c join users u on c.requester_id = u.id where c.receiver_id =? and c.status='Pending'",
+        "select c.id as connection_id,u.id,u.username from connections c join users u on c.requester_id = u.id where c.receiver_id =? and c.status='pending'",
         [user_id]
       );
     res.json(requests);
   } catch (err) {
     console.log(err);
+    res.status(500).json({ msg: "server error" });
   }
 });
 

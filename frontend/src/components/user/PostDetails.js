@@ -92,7 +92,27 @@ const PostDetail = () => {
     const receiver_id = post.user_id;
      await axios.post(`${API_BASE_URL}/api/initiate-connection/${receiver_id}/${user_id}`,{},{
       headers:{Authorization:localStorage.getItem('token')}
-     }).then(res=>console.log(res)).catch(err=>console.log("errrrrrrrrrrrrr"+err));
+     }).then(res=>{
+      console.log(res);
+      toast({
+        title:'Connection Request Sent',
+        description:'Your connection request has been sent successfully',
+        status:'success',
+        duration:4000,
+        isClosable:true,
+        position:'top-right'
+      });
+     }).catch(err=>{
+      console.log("errrrrrrrrrrrrr"+err);
+      toast({
+        title:'Error',
+        description: err.response?.data?.msg || 'Failed to send connection request',
+        status:'error',
+        duration:4000,
+        isClosable:true,
+        position:'top-right'
+      });
+     });
   }
 //  console.log(post)
   return (
